@@ -10,6 +10,21 @@ can call or export), Tool (the `tessoa-plugin` command-line tool and the
 runner it tests with) and Kit (the manual, the guides, the reference and the
 examples).
 
+## Unreleased
+
+### Kit
+
+- The calculator examples work out a whole expression, with brackets and
+  multiplication before addition, and keep the last 50 results in a history;
+  a click on one starts again from it.
+- The calculator examples keep their history out of the way: the keys have
+  the whole page, with the last calculation in a quiet line above the number.
+  A button on that line, or Ctrl+H, opens the history beside the keys in a
+  split whose bar the user can drag; whether it is open and where the bar is
+  survive a restart. A click on an entry's expression puts it back to be
+  changed, a click on its result starts again from that number. A state saved
+  by the previous version keeps its history.
+
 ## 0.2.0 (2026-11-10)
 
 ### Interface

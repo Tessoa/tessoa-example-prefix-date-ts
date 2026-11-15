@@ -12,7 +12,7 @@ Complete pages to copy from, each with page scenarios in its
 
 | Example | Shows |
 |---|---|
-| `examples/calculator-ts`, `examples/calculator-rs` | The same page in both languages: buttons, declared keys, the clipboard, state that survives a restart. The TypeScript one also has its own colours, `[theme]` in its `plugin.toml`. |
+| `examples/calculator-ts`, `examples/calculator-rs` | The same page in both languages: buttons, declared keys, the clipboard, a history that opens beside the keys in a split, state that survives a restart. The TypeScript one also has its own colours, `[theme]` in its `plugin.toml`. |
 | `examples/controls-ts`, `examples/controls-rs` | Every control, the same page in both languages: choices, values, a colour, a date, an image, rich text, a grid, a fold, a popup, a split, a list, a table and a tree. |
 | `examples/shelf-ts` | Files: a drop zone, file rows, copy, move and trash done by tessoa, a command that opens the page. |
 | `examples/kanban-ts` | A board: draggable cards, a card menu, a field of several lines, a question before deleting, data shared by every page. |
@@ -910,41 +910,66 @@ scenario. The calculator, freshly opened:
 
 ```
 page 1 calculator: "Calculator"
-keys: 0 1 2 3 4 5 6 7 8 9 . + - * / = Enter Backspace Escape Delete Ctrl+c Meta+c
-state: "{\"display\":\"0\",\"acc\":null,\"op\":null,\"fresh\":true}"
+keys: 0 1 2 3 4 5 6 7 8 9 . + - * / ( ) = Enter Backspace Escape Delete Ctrl+c Meta+c Ctrl+h Meta+h
+state: "{\"tokens\":[],\"answer\":null,\"history\":[],\"nextId\":1,\"historyOpen\":false,\"ratio\":0.62}"
 column pad=m gap=s
-  text "" key=pending size=caption tone=dim align=end
-  text "0" key=display size=display align=end
+  row gap=s align=center
+    text "" key=last size=caption tone=dim grow
+    icon-button "Show history" key=toggle-history kind=quiet icon=menu
+  text "" key=expression size=caption tone=dim align=end
+  row gap=s align=center
+    icon-button "Copy" key=copy icon=copy
+    text "0" key=display size=display align=end grow
   row gap=s
     button "C" key=clear grow
-    button "⌫" key=back grow
+    button "(" key=open grow
+    button ")" key=close grow
     button "÷" key=div grow
-    button "×" key=mul grow
   row gap=s
     button "7" key=k7 grow
     button "8" key=k8 grow
     button "9" key=k9 grow
-    button "−" key=sub grow
+    button "×" key=mul grow
   row gap=s
     button "4" key=k4 grow
     button "5" key=k5 grow
     button "6" key=k6 grow
-    button "+" key=add grow
+    button "−" key=sub grow
   row gap=s
     button "1" key=k1 grow
     button "2" key=k2 grow
     button "3" key=k3 grow
-    button "=" key=eq kind=primary grow
+    button "+" key=add grow
   row gap=s
     button "0" key=k0 grow
     button "." key=dot grow
-    button "Copy" key=copy grow
+    button "⌫" key=back grow
+    button "=" key=eq kind=primary grow
 ```
 
 The Rust calculator prints the same lines; only the state differs, since
-each language saves it its own way. A text field prints the value the page
-gives it, and `holds="..."` when it keeps what the user typed instead. The
-controls have one line each, written the way the attributes are:
+each language saves it its own way. After Ctrl+H the same column sits on the
+left of a split, with the history on the right:
+
+```
+column
+  split key=panes ratio=0.62 grow
+    column pad=m gap=s
+      row gap=s align=center
+        text "" key=last size=caption tone=dim grow
+        icon-button "Hide history" key=toggle-history icon=menu
+      ...
+    column pad=m gap=s
+      row gap=s align=center
+        text "History" size=caption tone=dim grow
+        button "Clear history" key=clear-history kind=quiet disabled
+      column key=history grow gap=xs scroll
+        text "No calculations yet" key=history-empty tone=dim align=center
+```
+
+A text field prints the value the page gives it, and `holds="..."` when it
+keeps what the user typed instead. The controls have one line each, written
+the way the attributes are:
 
 ```
     dropdown key=format value=iso options=[iso "2026-10-15", us "10/15/2026", eu "15.10.2026"] tip="How the summary writes the day"
